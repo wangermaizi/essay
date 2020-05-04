@@ -8,9 +8,12 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var uploadRouter = require("./routes/upload");
 var apiRouter = require('./routes/api');
-
+const cors = require('cors');
 
 var app = express();
+
+// 允许跨域
+// app.use(cors);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
