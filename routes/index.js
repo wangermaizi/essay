@@ -3,7 +3,17 @@ var router = express.Router();
 var Mock = require("mockjs");
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  // 获取首页的cookie
+  console.log(req.cookies);
+  let name = req.cookies.name;
+  let pass = req.cookies.pass;
+
+  if (name === undefined || pass === undefined) {
+    name = null;
+    pass = null;
+  }
+
+  res.render('index', { title: 'Express', name, pass });
 });
 router.get('/form', function (req, res, next) {
   res.render('form')
@@ -78,6 +88,32 @@ router.get("/pdf", async function (req, res, next) {
 // 实现翻书的效果
 router.get('/turn', async function (req, res, next) {
   res.render('turnbook')
+});
+
+router.get('/login', async function (req, res, next) {
+  res.render('about_cookie')
+})
+
+// 登录的login
+router.post('/login', function (req, res, next) {
+  let obj = req.body;
+  console.log(obj);
+  console.log(obj.length);
+  if (obj.length !== null) {
+    let name = obj.username;
+    let pass = obj.pass;
+
+    console.log(name);
+    console.log(pass);
+    // 设置cookie
+    res.cookie("name",name,{maxAge: 900000, httpOnly: true});
+    res.cookie("pass",pass,{maxAge: 900000, httpOnly: true});
+    // httpOnly,默认为false, 不允许客户端访问
+
+    res.send('登录成功');
+  } else {
+    res.redirect("/login")
+  }
 });
 
 module.exports = router;

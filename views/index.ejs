@@ -9,6 +9,10 @@
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+    <% if (name !== null && pass !== null) {%>
+    <h2>您的账号为: <%= name%> </h2>
+    <h3>密码为: <%= pass%> </h3>
+    <% } %>
     <div class="layui-form-item">
       <label class="layui-form-label">头像</label>
       <div class="layui-input-inline">
