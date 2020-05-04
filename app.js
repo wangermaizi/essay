@@ -13,7 +13,7 @@ const cors = require('cors');
 var app = express();
 
 // 允许跨域
-// app.use(cors);
+// app.use(cors);  这里设置不对的话, 会严重影响项目运行的
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
