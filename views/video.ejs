@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试video-player</title>
+    <%# 引入video.js插件%>
+    <script src="/video7.4.1/js/video.min.js" type="text/javascript" charset="UTF-8"></script>
+    <link rel="stylesheet" href="/video7.4.1/css/video-js.min.css" type="text/css">
+    <style type="text/css">
+        .main{
+            width: 800px;
+            height: auto;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1><%= option.title%></h1>
+    <div class="main">
+        <%# data-setup="{ }"  使控件样式发生改变%>
+        <%# class="video-js" 为播放器补充样式%>
+        <%# width="800" height="450" 宽高为具体数值, 不能模棱两可%>
+        <%# class="vjs-big-play-centered" 给初始播放器按钮显示居中的效果%>
+        <%# preload="auto" 预加载%>
+        <video id="video" class="video-js vjs-big-play-centered" preload="auto" width="800" height="450" data-setup="{ }" controls>
+            <source src="<%= option.url %>" />
+        </video>
+    </div>
+<script>
+    let mVideo = videojs("#video");
+    console.log(mVideo);
+    mVideo.ready(function () {
+        // alert('视频加载结束');
+        // 在ready中显示NaN
+        console.log(this.duration());
+        //缓冲 --> 查看视频缓冲了多少
+        console.log(this.buffered());
+    })
+    //获取声音 --> 准确的说是获取音量大小
+    console.log(mVideo.volume());
+    console.log(mVideo.duration()); // 输出NaN
+    //100秒处开始播放
+    mVideo.currentTime(30);
+    //绑定在window上，点击可获取当前时间进度 mVideo.currentTime()
+    onclick=function(){
+        // alert(mVideo.currentTime());
+        alert(mVideo.duration()) // 可以输出总时长
+        <%#在这里可以看出 ready不如canplay
+           因为canplay中已经可以获取到总时长，而ready中还是NaN，有点辣鸡啊 %>
+    }
+</script>
+</body>
+</html>

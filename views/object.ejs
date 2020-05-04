@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>对象写法</title>
+    <style>
+        .main{
+            width: 800px;
+            height: 600px;
+            background-color: #cccccc;
+        }
+        .main .content{
+            width: 200px;
+            height: 200px;
+            background-color: #00FFFF;
+            border-radius: 10px;
+            margin: auto auto;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="content"></div>
+</div>
+    <script>
+        class VideoRes{
+            constructor(el, sel){
+                this.el = el;
+                this.secEl = sel;
+                this.clickDiv = document.querySelector(this.secEl)
+            }
+            init(){
+                this.clickDiv.addEventListener("click", function () {
+                    console.log(111);
+                })
+            }
+        }
+        console.log(111);
+        let ves = new VideoRes(".main", ".content")
+        ves.init()
+        // document.onload = function () {
+        //     console.log(11);
+        //     let ves = new VideoRes(".main", ".content")
+        //     ves.init()
+        // }
+    </script>
+</body>
+</html>

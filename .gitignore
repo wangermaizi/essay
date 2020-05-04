@@ -1,0 +1,2 @@
+# 忽视node_modules 下面所有的文件夹
+node_modules/

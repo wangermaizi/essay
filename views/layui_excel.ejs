@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>layui-excel</title>
+    <!-- 导入layui插件 -->
+    <link rel="stylesheet" href="/layui/css/layui.css" type="text/css"/>
+    <script src="/layui/layui.js"></script>
+    <style>
+        .layui-container {
+            padding-bottom: 50px;
+        }
+    </style>
+
+    <script type="text/javascript" charset="UTF-8">
+        // 加载插件
+
+        // 测试layui-excel的导出
+        layui.config({
+            base: 'layui_exts/'
+        }).extend({
+            excel: 'excel'
+        });
+    </script>
+    <script src="/index.js" charset="UTF-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-col-md11 layui-col-md-offset1">
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-label">导出操作</div>
+                    <div class="layui-form-block">
+                        <button type="button" class="layui-btn layui-btn-primary" onclick="exportDataByUser()">导出数据测试</button>
+                        <button type="button" class="layui-btn layui-btn-primary" onclick="exportApiDemo('./list.json')">导出接口数据</button>
+                        <button type="button" class="layui-btn layui-btn-primary" onclick="exportExtendDemo()">导出复杂表头</button>
+                        <button type="button" class="layui-btn layui-btn-primary" onclick="exportStyleDemo()">批量设置样式</button>
+                        <!--<button type="button" class="layui-btn layui-btn-primary" onclick="exportBorderDemo()">快速设置边框</button>-->
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-label">导入模板</div>
+                    <div class="layui-form-block">
+                        <a class="layui-btn layui-btn-primary" href="demos/test_import.xlsx">常规单元格数据</a>
+                        <a class="layui-btn layui-btn-primary" href="demos/test_merge.xlsx">合并单元格数据</a>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-label">导入操作</div>
+                    <div class="layui-form-block">
+                        <input type="file" class="layui-btn layui-btn-primary" id="LAY-excel-import-excel" multiple="multiple">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-label"></div>
+                    <div class="layui-form-block">
+                        <p class="help-block" style="color: #f00;">高级浏览器可以在本页面上直接将文件拖入</p>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-label">Upload模块</div>
+                    <div class="layui-form-block">
+                        <button type="button" class="layui-btn" id="LAY-excel-upload">
+                            <i class="layui-icon">&#xe67c;</i>上传文档
+                        </button>
+                    </div>
+                </div>
+                <div id="LAY-excel-demo-list-dom"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<!-- 加载layui模板, 这个加载模板的写法存在点问题 -->
+<script type="text/html" id="LAY-excel-export-ans">
+    {{# layui.each(d.data, function(file_index, item){ }}
+    <blockquote class="layui-elem-quote">{{d.files[file_index].name}}</blockquote>
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            {{# layui.each(item, function(sheet_name, content) { }}
+            <li>{{sheet_name}}</li>
+            {{# }); }}
+        </ul>
+        <div class="layui-tab-content">
+            {{# layui.each(item, function(sheet_name, content) { }}
+            <div class="layui-tab-item">
+                <table class="layui-table">
+                    {{# layui.each(content, function(row_index, value) { }}
+                    {{# var col_index = 0 }}
+                    <tr>
+                        {{# layui.each(value, function(col_key, val) { }}
+                        <td id="table-export-{{file_index}}-{{sheet_name}}-{{row_index}}-{{col_index++}}">{{val}}</td>
+                        {{# });}}
+                    </tr>
+                    {{# });}}
+                </table>
+                <!-- 预览代码最后可以去掉 -->
+               <!-- <pre class="layui-code">{{JSON.stringify(content, null, 2)}}</pre> -->
+            </div>
+            {{# }); }}
+        </div>
+    </div>
+    {{# }) }}
+</script>
+</html>

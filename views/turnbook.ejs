@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>turn.js实现手机移动端翻书的效果</title>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        #magazine {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        #pages {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        #pages div.turn-page{
+            background: #fff;
+        }
+        #content{
+            height: 0;
+            overflow: hidden;
+            width: 100%;
+        }
+        #contentText{
+            width: 100%;
+        }
+
+        /* 这里是内容的样式,修改时候,一起修改 */
+        div.turn-page,#contentText{
+            white-space: pre-wrap;
+            box-sizing: border-box;
+            padding: 0 10px;
+        }
+
+
+        #alert{
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            border-radius: 4px;
+            color: #fff;
+            z-index: 10;
+            font-size: 12px;
+            padding: 6px 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="magazine">
+        <div id="pages"></div>
+        <div id="content">
+            <div id="contentText"></div>
+        </div>
+    </div>
+    <div id="alert"></div>
+
+    <%# 引入jQuery和turn.js%>
+    <script type="text/javascript" src="/turnjs4/lib/jquery.min.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="/turnjs4/lib/turn.js" charset="UTF-8"></script>
+    <script>
+        $(function () {
+            var writeStr = ""
+            //模拟请求文本数据
+            $.get("/upload/uploadtxt/test_01.txt",function(data){
+                initPage(data);
+            })
+            function initPage(writeStr){
+                if(!writeStr){
+                    return ;
+                }
+
+                var $wrap = $("#magazine");
+                var $page = $("#pages");
+                var w =$page.width(); //窗口的宽度
+                var h = $page.height(); //窗口的高度
+                console.log(h)
+                var $content = $("#contentText");
+
+                $content.html(writeStr);
+                var len = writeStr.length; //总长度
+                var cH = $content.height(); //总高度
+                var pageStrNum; //每页大概有多少个字符
+                if(cH > h){
+                    pageStrNum = (h / cH )*len; //每页大概有多少个字符
+                    var obj = overflowhiddenTow($content,writeStr,h);
+                    $page.append('<div>'+obj.curr+'</div>');
+                    while(obj.next && obj.next.length > 0){
+                        obj = overflowhiddenTow($content, obj.next,h);
+                        $page.append('<div>'+obj.curr+'</div>');
+                    }
+                }else{
+                    return ;
+                }
+
+                //文字切割算法
+                function overflowhiddenTow($texts, str , at) {
+                    var throat = pageStrNum;
+                    var tempstr = str.substring(0, throat);
+                    var len = str.length;
+                    $texts.html(tempstr);
+                    //取的字节较少,应该增加
+                    while ($texts.height() < at && throat < len) {
+                        throat = throat + 2;
+                        tempstr = str.substring(0, throat);
+                        $texts.html(tempstr);
+                    }
+                    //取的字节较多,应该减少
+                    while ($texts.height() > at && throat > 0) {
+                        throat = throat - 2;
+                        tempstr = str.substring(0, throat);
+                        $texts.html(tempstr);
+                    }
+
+                    return {
+                        curr:str.substring(0,throat),
+                        next:str.substring(throat)
+                    }
+
+                }
+
+                $page.turn({
+                    width: w,
+                    height: h,
+                    elevation: 50,
+                    display: 'single',
+                    gradients: true,
+                    autoCenter: true,
+                    when: {
+                        start: function() {},
+                        turning: function(e, page, view) {},
+                        turned: function(e, page, view) {
+
+                        }
+                    }
+                });
+
+
+
+                var moveObj = null;
+                var endObj = null;
+
+                function getPoint(e) {
+                    var obj = e;
+                    if (e.targetTouches && e.targetTouches.length > 0) {
+                        obj = e.targetTouches[0];
+                    }
+                    return obj;
+                }
+
+
+                $wrap.on("touchstart mousedown", function(e) {
+                    var obj = getPoint(e);
+                    moveObj = {
+                        x: obj.clientX
+                    };
+                });
+                $wrap.on("touchmove mousemove", function(e) {
+                    var obj = getPoint(e);
+                    endObj = {
+                        x: obj.clientX
+                    };
+                });
+
+
+                $wrap.on("touchend mouseup", function(e) {
+                    if (moveObj && endObj) {
+                        var mis = endObj.x - moveObj.x;
+                        if (Math.abs(mis) > 30) {
+                            var pageCount = $page.turn("pages"); //总页数
+                            var currentPage = $page.turn("page"); //当前页
+                            if (mis > 0) {
+                                if (currentPage > 1) {
+                                    $page.turn('page', currentPage - 1);
+                                } else {
+                                    console.log("已经是第一页")
+                                    showAlert('已经是第一页');
+                                }
+                            } else {
+                                if (currentPage < pageCount) {
+                                    $page.turn('page', currentPage + 1);
+                                } else {
+                                    console.log("最后一页");
+                                    showAlert('已经是最后一页');
+                                }
+                            }
+
+                        }
+
+                    }
+                    moveObj = null;
+                    endObj = null;
+                });
+
+                var $alert = $("#alert");
+                var timer = null;
+                function showAlert(msg){
+                    clearTimeout(timer);
+                    $alert.text(msg);
+                    $alert.fadeIn();
+                    timer = setTimeout(function(){
+                        $alert.fadeOut();
+                    },1000)
+                }
+            }
+        })
+    </script>
+</body>
+</html>
